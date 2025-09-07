@@ -4,17 +4,19 @@ void main() {
   runApp(const MainApp());
 }
 
-class Lista {
+class Produtos {
   String nome;
-  Lista(this.nome);
+
+  Produtos(this.nome);
 }
 
-final List<Lista> listaCompras = [
-  Lista("Arroz"),
-  Lista("Feijão"),
-  Lista("Carne"),
-  Lista("Filé de frango"),
-  Lista("Macarrão"),
+
+final List<Produtos> listaCompras = [
+  Produtos("Arroz"),
+  Produtos("Feijão"),
+  Produtos("Carne"),
+  Produtos("Filé de frango"),
+  Produtos("Macarrão"),
 ];
 
 class MainApp extends StatelessWidget {
@@ -43,6 +45,12 @@ class MainApp extends StatelessWidget {
 
 // Mostra a lista de compras e permite adicionar novos itens
 class __ListPagStateState extends State<_ListPagState> {
+
+    void apagarItem(int index) {
+    setState(() {
+      listaCompras.removeAt(index);
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,18 +78,36 @@ class __ListPagStateState extends State<_ListPagState> {
               child: ListView.builder(
                 itemCount: listaCompras.length,
                 itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text("Lista de compras ${listaCompras[index].nome}"),
-                    subtitle: Text("Subtítulo $index"),
-                    leading: Icon(Icons.shopping_cart),
-                    trailing: Icon(Icons.arrow_forward),
-                    onTap: () {
-                     /* Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ExemploPage()),
-                      );*/
-                    },
-                  );
+
+                  if (index%2==0){
+                    return Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: Color.fromARGB(255, 161, 240, 165),
+                        child: ListTile(
+                          title: Text("Comprar ${listaCompras[index].nome}"),
+                         // subtitle: Text("Quantidade $quantidade"),
+                          leading: Icon(Icons.shopping_cart, color: Colors.white),
+                          trailing: Icon(Icons.arrow_forward, color: Colors.white),
+                         onLongPress: () => apagarItem(index),
+                        ),
+                      ),
+                    );
+                  }
+                  else{
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                       color: Color.fromARGB(255, 6, 61, 8),
+                      child: ListTile(
+                        title: Text("Comprar ${listaCompras[index].nome}", style: TextStyle(color: Colors.white),),
+                       // subtitle: Text("Quantidade $quantidade"),
+                        leading: Icon(Icons.shopping_cart),
+                        trailing: Icon(Icons.arrow_forward),
+                       onLongPress: () => apagarItem(index),
+                      ),
+                    ),
+                  );}
                 },
               ),
             ),
@@ -99,18 +125,33 @@ class ExemploPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text('informe o produto que falta')),
       body: Center(
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              onSubmitted: (value) {
-                listaCompras.add(Lista(value));
-                
-                Navigator.pop(context);
-                
-              },
+        child: Column(
+          children: [
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onSubmitted: (value, ) {
+                    listaCompras.add(Produtos(value));
+                    Navigator.pop(context);
+                  },
+                ),
+              ),
             ),
-          ),
+            /*Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  onSubmitted: (value) {
+                   quantidade = value;
+                    
+                    Navigator.pop(context);
+                    
+                  },
+                ),
+              ),
+            ),*/
+          ],
         ),
       ),
     );
