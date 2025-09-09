@@ -1,22 +1,35 @@
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MainApp());
 }
-
+// Classe responsável por representar um produto na lista de compras
 class Produtos {
   String nome;
 
   Produtos(this.nome);
 }
+Future<void> salvarLista() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String> nomes = listaCompras.map((p) => p.nome).toList();
+  prefs.setStringList('listaCompras', nomes);
+}
+
+Future<void> carregarLista() async {
+  final prefs = await SharedPreferences.getInstance();
+  List<String>? nomes = prefs.getStringList('listaCompras');
+  if (nomes != null) {
+    listaCompras.clear();
+    listaCompras.addAll(nomes.map((n) => Produtos(n)));
+  }
+}
 
 
 final List<Produtos> listaCompras = [
-  Produtos("Arroz"),
-  Produtos("Feijão"),
-  Produtos("Carne"),
-  Produtos("Filé de frango"),
-  Produtos("Macarrão"),
+
 ];
 
 class MainApp extends StatelessWidget {
@@ -46,10 +59,34 @@ class MainApp extends StatelessWidget {
 // Mostra a lista de compras e permite adicionar novos itens
 class __ListPagStateState extends State<_ListPagState> {
 
-    void apagarItem(int index) {
+  @override
+  void initState() {
+    super.initState();
+    carregarLista();
+  }
+
+  Future<void> salvarLista() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> nomes = listaCompras.map((p) => p.nome).toList();
+    await prefs.setStringList('listaCompras', nomes);
+  }
+
+  Future<void> carregarLista() async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String>? nomes = prefs.getStringList('listaCompras');
+    if (nomes != null) {
+      setState(() {
+        listaCompras.clear();
+        listaCompras.addAll(nomes.map((n) => Produtos(n)));
+      });
+    }
+  }
+
+  void apagarItem(int index) {
     setState(() {
       listaCompras.removeAt(index);
     });
+    salvarLista();
   }
   @override
   Widget build(BuildContext context) {
@@ -59,9 +96,13 @@ class __ListPagStateState extends State<_ListPagState> {
             onPressed: () async {
               await Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ExemploPage()),
+                MaterialPageRoute(builder: (context) => ExemploPage(onAdd: (produto) {
+                  setState(() {
+                    listaCompras.add(Produtos(produto));
+                  });
+                  salvarLista();
+                })),
               );
-              setState(() {}); // Atualiza a lista ao voltar
             },
             child: Icon(Icons.add),
           ),
@@ -73,7 +114,9 @@ class __ListPagStateState extends State<_ListPagState> {
           ),
         ),
         body: Column(
+      
           children: [
+            SizedBox(height: 64),            
             Expanded(
               child: ListView.builder(
                 itemCount: listaCompras.length,
@@ -87,8 +130,8 @@ class __ListPagStateState extends State<_ListPagState> {
                         child: ListTile(
                           title: Text("Comprar ${listaCompras[index].nome}"),
                          // subtitle: Text("Quantidade $quantidade"),
-                          leading: Icon(Icons.shopping_cart, color: Colors.white),
-                          trailing: Icon(Icons.arrow_forward, color: Colors.white),
+                          leading: Icon(Icons.shopping_cart, color: Colors.black),
+                          trailing: Icon(Icons.arrow_forward, color: Colors.black),
                          onLongPress: () => apagarItem(index),
                         ),
                       ),
@@ -102,8 +145,8 @@ class __ListPagStateState extends State<_ListPagState> {
                       child: ListTile(
                         title: Text("Comprar ${listaCompras[index].nome}", style: TextStyle(color: Colors.white),),
                        // subtitle: Text("Quantidade $quantidade"),
-                        leading: Icon(Icons.shopping_cart),
-                        trailing: Icon(Icons.arrow_forward),
+                        leading: Icon(Icons.shopping_cart, color: Colors.white,),
+                        trailing: Icon(Icons.arrow_forward, color: Colors.white,),
                        onLongPress: () => apagarItem(index),
                       ),
                     ),
@@ -118,7 +161,8 @@ class __ListPagStateState extends State<_ListPagState> {
 }
 
 class ExemploPage extends StatelessWidget {
-  const ExemploPage({super.key});
+  final void Function(String) onAdd;
+  const ExemploPage({super.key, required this.onAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -131,26 +175,15 @@ class ExemploPage extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: TextField(
-                  onSubmitted: (value, ) {
-                    listaCompras.add(Produtos(value));
-                    Navigator.pop(context);
+                  onSubmitted: (value) {
+                    if (value.trim().isNotEmpty) {
+                      onAdd(value);
+                      Navigator.pop(context);
+                    }
                   },
                 ),
               ),
             ),
-            /*Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  onSubmitted: (value) {
-                   quantidade = value;
-                    
-                    Navigator.pop(context);
-                    
-                  },
-                ),
-              ),
-            ),*/
           ],
         ),
       ),
