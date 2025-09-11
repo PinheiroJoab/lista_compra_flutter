@@ -42,7 +42,8 @@ lib/
 
 ## Screenshots
 
-> Adicione aqui imagens do app em funcionamento.
+![Tela da lista](assets/tela_lista.png)
+![Tela da entrada de dados](assets/entrada_dado.png)
 
 ## Autor
 
