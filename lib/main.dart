@@ -77,6 +77,7 @@ class __ListPagStateState extends State<_ListPagState> {
     salvarLista();
   }
   @override
+  // Constrói a interface do usuário da página da lista de compras
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: Builder(
@@ -147,7 +148,7 @@ class __ListPagStateState extends State<_ListPagState> {
       );
   }
 }
-// Página de exemplo para adicionar um novo produto
+// Página de entrada para adicionar novos produtos à lista
 class EntradaPage extends StatefulWidget {
   final void Function(String) onAdd;
   const EntradaPage({super.key, required this.onAdd});
@@ -155,11 +156,12 @@ class EntradaPage extends StatefulWidget {
   @override
   State<EntradaPage> createState() => _EntradaPageState();
 }
-
+// Estado da página de entrada
 class _EntradaPageState extends State<EntradaPage> {
   String produto = "";
 
   @override
+      // Constrói a caixa de dialogo para entrada de dados do produto
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text("Adicionar Produto"),
